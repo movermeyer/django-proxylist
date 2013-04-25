@@ -36,4 +36,4 @@ setup(
         'grab',
     ]
 )
-from django.utils.timezone import now
+
