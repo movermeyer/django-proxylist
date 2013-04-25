@@ -19,4 +19,7 @@ class Command(BaseCommand):
         for p in proxies:
             m = choice(mirrors)
             if not m.is_checking(p):
-                m.check(p)
+                try:
+                    m.check(p)
+                except Exception, msg:
+                    print('%s - %s' % (str(p), msg))

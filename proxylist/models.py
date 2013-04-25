@@ -10,7 +10,6 @@ from random import randint
 from pygeoip import GeoIP
 from grab import Grab
 
-from django.contrib.sites.models import Site
 from django_countries import CountryField
 from django.utils.timezone import now
 from django.core.cache import cache
@@ -64,6 +63,9 @@ class ProxyCheckResult(models.Model):
         if self.real_ip_address is None:
             self.real_ip_address = self._get_real_ip()
 
+    def __unicode__(self):
+        return str(self.check_start)
+
     def _get_real_ip(self):
         ip_key = '%s.%s.ip' % (socket.gethostname(), os.getpid())
         ip = cache.get(ip_key)
@@ -92,8 +94,7 @@ class Mirror(models.Model):
     """A proxy checker site like.
     Ex: http://ifconfig.me/all.json
     """
-    url = models.URLField(
-        default='http://%s/mirror' % Site.objects.get_current().domain)
+    url = models.URLField(help_text='For example: http://local.com/mirror')
 
     output_type = models.CharField(
         max_length=10, default='plm_v1', choices=(

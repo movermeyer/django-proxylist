@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
-
 import grab
+
+from django.core.exceptions import ObjectDoesNotExist
 
 import defaults
 import models
@@ -14,7 +15,10 @@ USER_AGENT_FILE = os.path.join(APP_ROOT, 'data/agents.txt')
 
 def get_proxies():
     proxies = []
-    for obj in models.Proxy.objects.filter(errors=0):
+    proxies_list = models.Proxy.objects.filter(errors=0)
+    if not proxies_list.exists():
+        raise ObjectDoesNotExist('Active proxy not found!')
+    for obj in proxies_list:
         proxy = '%s:%d' % (obj.hostname, obj.port)
         if obj.user and obj.password:
             proxy += ':%s:%s' % (obj.user, obj.password)

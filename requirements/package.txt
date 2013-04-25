@@ -1,0 +1,5 @@
+django
+grab
+pygeoip
+django-countries
+django-celery

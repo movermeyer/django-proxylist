@@ -1,6 +1,10 @@
 Django-ProxyList-For-Grab
 =========================
 
+.. image:: https://api.travis-ci.org/gotlium/django-proxylist.png?branch=master
+    :alt: Build Status
+    :target: https://travis-ci.org/gotlium/django-proxylist
+
 This application is useful for keep an updated list of proxy servers, it
 contains everything you need to make periodic checks to verify the properties
 of the proxies.
@@ -30,6 +34,16 @@ After that you need to include `django-proxylist-for-grab` into your
      ...
      'proxylist',
      ...
+   )
+
+Add `django-proxylist-for-grab` into ``urls.py``
+
+.. code-block:: python
+
+   urlpatterns = patterns(
+    ...
+    url(r'', include('proxylist.urls')),
+    ...
    )
 
 
