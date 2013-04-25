@@ -32,8 +32,8 @@ setup(
     install_requires=[
         'django-countries',
         'pygeoip',
-        'django-celery',
         'django',
         'grab',
     ]
 )
+from django.utils.timezone import now

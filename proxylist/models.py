@@ -4,17 +4,20 @@ import socket
 import json
 import os
 
+from datetime import datetime, timedelta
 from dateutil.parser import parse
-from datetime import timedelta
 from random import randint
 from pygeoip import GeoIP
 from grab import Grab
 
 from django_countries import CountryField
-from django.utils.timezone import now
 from django.core.cache import cache
 from django.db import models
 
+try:
+    from django.utils.timezone import now
+except:
+    now = datetime.now
 
 import defaults
 
