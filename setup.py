@@ -31,6 +31,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'django-countries',
+        'python-dateutil',
         'pygeoip',
         'django',
         'grab',
