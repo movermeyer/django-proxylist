@@ -8,7 +8,7 @@ from dateutil.parser import parse
 from datetime import timedelta
 from random import randint
 from pygeoip import GeoIP
-from grabber import Grab
+from grab import Grab
 
 from django.contrib.sites.models import Site
 from django_countries import CountryField

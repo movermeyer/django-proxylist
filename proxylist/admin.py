@@ -7,7 +7,7 @@ from proxylist.models import Proxy, Mirror, ProxyCheckResult
 
 class ProxyAdmin(admin.ModelAdmin):
     list_display = ('hostname', 'port', 'country', 'anonymity_level',
-                    'last_check', 'proxy_type', 'errors',)
+                    'proxy_type', 'last_check', 'errors',)
     list_filter = ('anonymity_level', 'proxy_type', 'country',)
     search_fields = ('=hostname', '=port', 'country',)
     list_per_page = 25

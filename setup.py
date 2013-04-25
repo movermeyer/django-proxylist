@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name='django-proxylist-for-grab',
@@ -23,8 +23,10 @@ setup(
     author_email='robertomartinezp@gmail.com',
     url='https://github.com/gotlium/django-proxylist',
     license='GPL',
-    packages=['proxylist'],
-    package_data={'proxylist': ['data/agents.txt']},
+    packages=find_packages(),
+    package_data={'proxylist': [
+        'data/agents.txt',
+    ]},
     include_package_data=True,
     zip_safe=False,
     install_requires=[
