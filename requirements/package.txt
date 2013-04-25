@@ -4,3 +4,4 @@ pygeoip
 django-countries
 django-celery
 python-dateutil
+pycurl

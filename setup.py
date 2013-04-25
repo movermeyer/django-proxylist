@@ -34,6 +34,7 @@ setup(
         'python-dateutil',
         'pygeoip',
         'django',
+        'pycurl',
         'grab',
     ]
 )
