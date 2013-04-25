@@ -1,34 +1,28 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright 2012 Roberto Abdelkader Martínez Pérez
-# 
-# This file is part of Django-ProxyList.
-# 
-# Django-ProxyList is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-# 
-# Django-ProxyList is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with Django-ProxyList.  If not, see <http://www.gnu.org/licenses/>.
-
-from proxylist.models import Proxy, Mirror, ProxyCheckResult 
 from django.contrib import admin
 
+from proxylist.models import Proxy, Mirror, ProxyCheckResult
+
+
 class ProxyAdmin(admin.ModelAdmin):
-    list_display = ('ip_address', 'port', 'country', 'anonymity_level', 
-                    'last_check', 'proxy_type',  )
-    list_filter = ('anonymity_level', 'proxy_type', )
-    search_fields = ('=ip_address', '=port', 'country', )
+    list_display = ('hostname', 'port', 'country', 'anonymity_level',
+                    'last_check', 'proxy_type', 'errors',)
+    list_filter = ('anonymity_level', 'proxy_type', 'country',)
+    search_fields = ('=hostname', '=port', 'country',)
+    list_per_page = 25
 
-admin.site.register(Proxy, ProxyAdmin)
+
+class ProxyCheckResultAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def __init__(self, model, admin_site):
+        admin.ModelAdmin.__init__(self, model, admin_site)
+        self.readonly_fields = [field.name for field in model._meta.fields]
+        self.readonly_model = model
+
+
 admin.site.register(Mirror)
-
-# Debug
-#admin.site.register(ProxyCheckResult)
+admin.site.register(Proxy, ProxyAdmin)
+admin.site.register(ProxyCheckResult, ProxyCheckResultAdmin)

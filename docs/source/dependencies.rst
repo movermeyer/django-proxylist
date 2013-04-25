@@ -9,7 +9,7 @@ Packages
 * django-celery
 * django-countries
 * pygeoip
-* pycurl
+* grub
 
 .. todo::
 
