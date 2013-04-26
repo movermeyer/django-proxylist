@@ -85,9 +85,12 @@ class GrabProxies(Spider):
                 yield Task('search', url=url, **config)
 
     def task_search(self, grab, task):
-        if grab.doc.select(task.xpath).exists():
-            for element in grab.doc.select(task.xpath):
-                yield Task('find_proxy', url=element.attr('href'))
+        # if grab.doc.select(task.xpath).exists():
+        if grab.xpath_exists(task.xpath):
+            # for element in grab.doc.select(task.xpath):
+            for element in grab.xpath_list(task.xpath):
+                # yield Task('find_proxy', url=element.attr('href'))
+                yield Task('find_proxy', url=element.get('href'))
 
     def task_find_proxy(self, grab, task):
         for proxy in re.findall(self.proxy_re, grab.response.body):

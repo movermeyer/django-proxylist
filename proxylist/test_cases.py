@@ -48,7 +48,8 @@ class ProxyListTestCase(TestCase):
         self.assertEqual(grab.config.get('proxy').split(':')[-1], '7000')
         self.assertEqual(':7000' in grab.config.get('proxy'), True)
         self.assertEqual(grab.response.code, 200)
-        self.assertEqual(grab.doc.select('//html/body').exists(), True)
+        # self.assertEqual(grab.doc.select('//html/body').exists(), True)
+        self.assertEqual(grab.xpath_exists('//html/body'), True)
 
     def test_a_settings_is_set(self):
         self.assertRaises(ObjectDoesNotExist, grabber.get_proxies)

@@ -76,7 +76,12 @@ class ProxyCheckResult(models.Model):
         if ip:
             return ip
 
-        g = Grab()
+        g = Grab(
+            hammer_mode=True,
+            hammer_timeouts=defaults.GRABBER_HAMMER_TIMEOUTS,
+            connect_timeout=15,
+            timeout=30
+        )
         g.go("http://ifconfig.me/ip")
         ip = g.response.body.strip()
 
