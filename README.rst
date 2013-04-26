@@ -176,7 +176,7 @@ GrabLib usage example:
     # Get count of div on google page
     grab.go('http://www.google.com/')
     if grab.response.code == 200:
-        print grab.doc.select('//div').number()
+        print len(grab.xpath_list('//div'))
 
 
 

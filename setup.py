@@ -32,6 +32,7 @@ setup(
     install_requires=[
         'django-countries',
         'python-dateutil',
+        'multiprocessing',
         'pygeoip',
         'django',
         'pycurl',

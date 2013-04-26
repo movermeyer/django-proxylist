@@ -12,8 +12,6 @@ def check_proxies():
     mirrors = Mirror.objects.all()
     proxies = Proxy.objects.filter(next_check__lte=now())
 
-    print '>>> %d' % proxies.count()
-
     for p in proxies:
         m = choice(mirrors)
         if not m.is_checking(p):

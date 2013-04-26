@@ -1,8 +1,9 @@
 django
-grab
-pygeoip
 django-countries
 django-celery
+multiprocessing
 python-dateutil
+pygeoip
 pycurl
 lxml
+grab
