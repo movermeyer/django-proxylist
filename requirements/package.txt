@@ -5,3 +5,4 @@ django-countries
 django-celery
 python-dateutil
 pycurl
+lxml
