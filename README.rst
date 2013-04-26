@@ -4,6 +4,9 @@ Django-ProxyList-For-Grab
 .. image:: https://api.travis-ci.org/gotlium/django-proxylist.png?branch=master
     :alt: Build Status
     :target: https://travis-ci.org/gotlium/django-proxylist
+.. image:: https://coveralls.io/repos/gotlium/django-proxylist/badge.png?branch=master
+    :alt: Coverage
+    :target: https://coveralls.io/r/gotlium/django-proxylist
 
 This application is useful for keep an updated list of proxy servers, it
 contains everything you need to make periodic checks to verify the properties
