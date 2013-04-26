@@ -8,18 +8,24 @@ from django.utils.timezone import now
 from proxylist.models import Proxy, Mirror
 
 
+def check_proxies():
+    mirrors = Mirror.objects.all()
+    proxies = Proxy.objects.filter(next_check__lte=now())
+
+    print '>>> %d' % proxies.count()
+
+    for p in proxies:
+        m = choice(mirrors)
+        if not m.is_checking(p):
+            try:
+                m.check(p)
+            except Exception, msg:
+                print('%s - %s' % (str(p), msg))
+
+
 class Command(BaseCommand):
     args = '<proxy list files>'
     help = 'Update proxy list from file(s)'
 
     def handle(self, *args, **options):
-        mirrors = Mirror.objects.all()
-        proxies = Proxy.objects.filter(next_check__lte=now())
-
-        for p in proxies:
-            m = choice(mirrors)
-            if not m.is_checking(p):
-                try:
-                    m.check(p)
-                except Exception, msg:
-                    print('%s - %s' % (str(p), msg))
+        check_proxies()

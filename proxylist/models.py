@@ -246,7 +246,7 @@ class Proxy(models.Model):
         (ANONYMITY_HIGH, 'High'),
     )
 
-    hostname = models.CharField(max_length=25, unique=True)
+    hostname = models.CharField(max_length=75, unique=True)
     port = models.PositiveIntegerField()
     user = models.CharField(blank=True, null=True, max_length=50)
     password = models.CharField(blank=True, null=True, max_length=50)

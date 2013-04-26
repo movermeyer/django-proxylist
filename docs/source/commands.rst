@@ -1,6 +1,7 @@
 Command reference
 =================
 
+
 update_proxies
 --------------
 
@@ -21,3 +22,12 @@ Check proxies availability and anonymity.
    $ python manage.py check_proxies 
 
 
+grab_proxies
+------------
+
+Search proxy list on internet
+
+
+.. code-block:: bash
+
+   $ python manage.py grab_proxies
