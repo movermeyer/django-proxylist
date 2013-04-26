@@ -14,10 +14,11 @@ from django_countries import CountryField
 from django.core.cache import cache
 from django.db import models
 
+now = datetime.now
 try:
     from django.utils.timezone import now
-except:
-    now = datetime.now
+except ImportError:
+    pass
 
 import defaults
 

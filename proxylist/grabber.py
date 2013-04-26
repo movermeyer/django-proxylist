@@ -45,3 +45,8 @@ def Grab(**kwargs):
         auto_change=True
     )
     return grb
+
+
+class Spider(grab.spider.base.Spider):
+    def create_grab_instance(self):
+        return Grab(**self.grab_config)

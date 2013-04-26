@@ -143,4 +143,41 @@ GrabLib usage example:
         print grab.doc.select('//div').number()
 
 
+
+
+GrabLib Spider example:
+----------------------
+
+.. code-block:: python
+
+    # filename: apps/app/management/commands/spider.py
+    # usage: python manage.py spider
+    from django.core.management.base import BaseCommand
+    from grab.spider.base import Task
+    from proxylist.grabber import Spider
+
+
+    class SimpleSpider(Spider):
+        initial_urls = ['http://ya.ru/']
+
+        def task_initial(self, grab, task):
+            grab.set_input('text', 'linux')
+            grab.submit(make_request=False)
+            yield Task('search', grab=grab)
+
+        def task_search(self, grab, task):
+            for elem in grab.xpath_list('//h2/a'):
+                print elem.text_content()
+
+
+    class Command(BaseCommand):
+        help = 'Simple Spider'
+
+        def handle(self, *args, **options):
+            bot = SimpleSpider()
+            bot.run()
+            print bot.render_stats()
+
+
+
 * Gihub: https://github.com/gotlium/django-proxylist
