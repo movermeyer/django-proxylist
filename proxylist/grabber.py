@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
-import grab
 
 from django.core.exceptions import ObjectDoesNotExist
+
+from grab import spider, Grab as GrabLib
 
 import defaults
 import models
@@ -27,7 +28,7 @@ def get_proxies():
 
 
 def Grab(**kwargs):
-    grb = grab.Grab()
+    grb = GrabLib()
     default_settings = {
         'user_agent_file': USER_AGENT_FILE,
         'connect_timeout': defaults.GRABBER_CONNECT_TIMEOUT,
@@ -47,6 +48,6 @@ def Grab(**kwargs):
     return grb
 
 
-class Spider(grab.spider.base.Spider):
+class Spider(spider.base.Spider):
     def create_grab_instance(self):
         return Grab(**self.grab_config)
