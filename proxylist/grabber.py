@@ -16,7 +16,8 @@ USER_AGENT_FILE = os.path.join(APP_ROOT, 'data/agents.txt')
 
 def get_proxies():
     proxies = []
-    proxies_list = models.Proxy.objects.filter(errors=0)
+    proxies_list = models.Proxy.objects.filter(
+        errors=0, last_check__isnull=False)
     if not proxies_list.exists():
         raise ObjectDoesNotExist('Active proxy not found!')
     for obj in proxies_list:

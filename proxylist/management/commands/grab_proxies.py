@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 import multiprocessing
 import logging
 import re
@@ -13,13 +13,15 @@ from grab.spider.base import Spider, Task
 from proxylist.defaults import PROXY_LIST_MAX_CHECK_INTERVAL as max_check
 from check_proxies import check_proxies
 from proxylist.models import Proxy
+from proxylist import now
+from proxylist import defaults
 
 
 class GoogleSearchEngine(object):
     name = "Google"
     query = []
     page_start = 0
-    page_end = 3
+    page_end = defaults.SPIDER_PAGE_END
     page_step = 10
     start_url = "http://www.google.ru/search?q=%(q)s&hl=ru&start=%(start)d"
     xpath = '//*[@id="rso"]/li/div/h3/a'
@@ -29,7 +31,7 @@ class YandexSearchEngine(object):
     name = "Yandex"
     query = []
     page_start = 0
-    page_end = 3
+    page_end = defaults.SPIDER_PAGE_END
     page_step = 1
     start_url = "http://yandex.ru/yandsearch?p=%(start)d&text=%(q)s"
     xpath = '//h2/a'
@@ -96,10 +98,13 @@ class GrabProxies(Spider):
         for proxy in re.findall(self.proxy_re, grab.response.body):
             if ':' in proxy:
                 proxy, port = proxy.strip().split(':')
-                obj = Proxy.objects.get_or_create(hostname=proxy)[0]
-                obj.port = port
-                obj.next_check = datetime.now() - timedelta(seconds=max_check)
-                obj.save()
+                try:
+                    obj = Proxy.objects.create(hostname=proxy, port=port)
+                    obj.port = port
+                    obj.next_check = (now() - timedelta(seconds=max_check))
+                    obj.save()
+                except:
+                    pass
 
 
 class Command(BaseCommand):

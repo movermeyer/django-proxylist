@@ -149,7 +149,6 @@ Check proxies availability and anonymity.
    $ python manage.py check_proxies
 
 
-
 grab_proxies
 ~~~~~~~~~~~~
 
@@ -159,6 +158,17 @@ Search proxy list on internet
 .. code-block:: bash
 
    $ python manage.py grab_proxies
+
+
+clean_proxies
+~~~~~~~~~~~~~
+
+Remove broken proxies
+
+
+.. code-block:: bash
+
+   $ python manage.py clean_proxies
 
 
 

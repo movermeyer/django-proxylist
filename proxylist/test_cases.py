@@ -10,6 +10,7 @@ from grab.error import GrabTimeoutError
 from proxylist import grabber
 from proxylist import models
 
+from proxylist import now
 import defaults
 
 
@@ -36,6 +37,7 @@ class ProxyListTestCase(TestCase):
         for data in self.proxies:
             if port and data['port'] != port:
                 continue
+            data['last_check'] = now()
             self.proxy.create(**data)
             count += 1
         self.assertEqual(self.proxy.all().count(), count)

@@ -3,9 +3,9 @@
 from random import choice
 
 from django.core.management.base import BaseCommand
-from django.utils.timezone import now
 
 from proxylist.models import Proxy, Mirror
+from proxylist import now
 
 
 def check_proxies():

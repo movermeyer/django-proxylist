@@ -4,8 +4,8 @@ import socket
 import json
 import os
 
-from datetime import datetime, timedelta
 from dateutil.parser import parse
+from datetime import timedelta
 from random import randint
 from pygeoip import GeoIP
 from grab import Grab
@@ -14,12 +14,7 @@ from django_countries import CountryField
 from django.core.cache import cache
 from django.db import models
 
-now = datetime.now
-try:
-    from django.utils.timezone import now
-except ImportError:
-    pass
-
+from proxylist import now
 import defaults
 
 
@@ -174,9 +169,7 @@ class Mirror(models.Model):
 
         check_key = "proxy.%s.check" % proxy.pk
 
-        res = None
         try:
-
             res = ProxyCheckResult()
             res.proxy = proxy
             res.mirror = self
@@ -323,7 +316,7 @@ class Proxy(models.Model):
     class Meta:
         verbose_name = 'Proxy'
         verbose_name_plural = 'Proxies'
-        ordering = ('-last_check', )
+        ordering = ('-last_check',)
 
     def __unicode__(self):
         return "%s://%s:%s" % (self.proxy_type, self.hostname, self.port)

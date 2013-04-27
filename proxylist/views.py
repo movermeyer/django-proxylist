@@ -2,8 +2,9 @@
 
 import json
 
-from django.utils.timezone import now
 from django.http import HttpResponse
+
+from proxylist import now
 
 
 def mirror(request):
