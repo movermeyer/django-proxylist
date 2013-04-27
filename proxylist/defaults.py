@@ -10,7 +10,7 @@ def get_settings(key, default):
 PROXY_LIST_CACHE_TIMEOUT = get_settings(
     "PROXY_LIST_CACHE_TIMEOUT", 0)
 PROXY_LIST_CONNECTION_TIMEOUT = get_settings(
-    "PROXY_LIST_CONNECTION_TIMEOUT", 30)
+    "PROXY_LIST_CONNECTION_TIMEOUT", 10)
 PROXY_LIST_ERROR_DELAY = get_settings(
     "PROXY_LIST_ERRORDELAY", 300)
 PROXY_LIST_GEOIP_PATH = get_settings(
@@ -23,8 +23,12 @@ PROXY_LIST_OUTIP_INTERVAL = get_settings(
     "PROXY_LIST_OUTIP_INTERVAL", 300)
 PROXY_LIST_USER_AGENT = get_settings(
     "PROXY_LIST_USER_AGENT", "Django-Proxy 1.0.0")
-PROXY_LIST_USE_CALLERY = get_settings(
-    "PROXY_LIST_USE_CALLERY", False)
+
+
+if 'djcelery' not in settings.INSTALLED_APPS:
+    PROXY_LIST_USE_CALLERY = False
+else:
+    PROXY_LIST_USE_CALLERY = get_settings("PROXY_LIST_USE_CALLERY", False)
 
 GRABBER_HEADERS = get_settings(
     'GRABBER_HEADERS', {'Accept-Language': 'ru-ru,ru;q=0.7'})

@@ -1,9 +1,19 @@
 # -*- coding: utf-8 -*-
 
+from django.shortcuts import render
 from django.contrib import admin
 from django.conf import settings
 
+from django import VERSION
+
+if VERSION[1] < 5:
+    from django.conf.urls.defaults import patterns, url
+else:
+    from django.conf.urls import patterns, url
+
 from proxylist.models import Proxy, Mirror, ProxyCheckResult
+from proxylist import tasks
+import defaults
 
 
 class ProxyAdmin(admin.ModelAdmin):
@@ -12,6 +22,54 @@ class ProxyAdmin(admin.ModelAdmin):
     list_filter = ('anonymity_level', 'proxy_type', 'country',)
     search_fields = ('=hostname', '=port', 'country',)
     list_per_page = 25
+
+    def changelist_view(self, request, extra_context=None):
+        if defaults.PROXY_LIST_USE_CALLERY:
+            self.change_list_template = 'proxylist/admin/change_list_link.html'
+
+        return super(ProxyAdmin, self).changelist_view(
+            request, extra_context=extra_context)
+
+    def _proxies_view(self, request, title, task):
+        task.delay()
+        return render(
+            request, 'proxylist/admin/proxylist.html', {
+                'app_label': self.model._meta.app_label,
+                'title': title
+            }
+        )
+
+    def clean_proxies(self, request):
+        return self._proxies_view(request, 'Clean proxies', tasks.CleanProxies)
+
+    def check_proxies(self, request):
+        return self._proxies_view(request, 'Check proxies', tasks.CheckProxies)
+
+    def grab_proxies(self, request):
+        return self._proxies_view(request, 'Grab proxies', tasks.GrabProxies)
+
+    def get_urls(self):
+        urls = super(ProxyAdmin, self).get_urls()
+
+        admin_urls = patterns(
+            '',
+            url(
+                r'^clean_proxies/$',
+                self.admin_site.admin_view(self.clean_proxies),
+                name='admin_do_clean_proxies'
+            ),
+            url(
+                r'^check_proxies/$',
+                self.admin_site.admin_view(self.check_proxies),
+                name='admin_do_check_proxies'
+            ),
+            url(
+                r'^grab_proxies/$',
+                self.admin_site.admin_view(self.grab_proxies),
+                name='admin_do_grab_proxies'
+            ),
+        )
+        return admin_urls + urls
 
 
 class ProxyCheckResultAdmin(admin.ModelAdmin):

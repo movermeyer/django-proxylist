@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
 
 from datetime import timedelta
-import multiprocessing
 import logging
 import re
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from grab.spider.base import Spider, Task
+from grab.spider.base import Spider, Task, logger
+import multiprocessing
 
 from proxylist.defaults import PROXY_LIST_MAX_CHECK_INTERVAL as max_check
-from check_proxies import check_proxies
 from proxylist.models import Proxy
 from proxylist import now
 from proxylist import defaults
+from check_proxies import check_proxies
+
+
+# I'm using Sentry, and for this reason - logging disabled in GrabSpider.
+# Connection errors is doesn't matter for me :-)
+logger.disabled = True
 
 
 class GoogleSearchEngine(object):
@@ -38,7 +43,6 @@ class YandexSearchEngine(object):
 
 
 class GrabProxies(Spider):
-
     initial_urls = ["http://www.google.com"]
     default_plugin = GoogleSearchEngine()
     proxy_re = r"(?:(?:[-a-z0-9]+\.)+)[a-z0-9]+:\d{2,4}"
@@ -46,8 +50,6 @@ class GrabProxies(Spider):
         u"free proxy", u"free proxy list", u"бесплатные прокси",
         u"список бесплатных прокси"
     ]
-    site_max_depth = 0
-    timeouts = 0.1
     plugins = []
     urls = []
     configs = []
@@ -107,19 +109,24 @@ class GrabProxies(Spider):
                     pass
 
 
+def grab_proxies():
+    spider = GrabProxies(thread_number=(multiprocessing.cpu_count() + 1))
+    spider.setup_plugins(GoogleSearchEngine(), YandexSearchEngine())
+    spider.initial()
+    spider.run()
+
+    if settings.DEBUG:
+        print spider.render_stats()
+
+    check_proxies()
+
+
 class Command(BaseCommand):
     help = 'Search proxy list on internet'
 
     def handle(self, *args, **options):
         if settings.DEBUG:
+            logger.disabled = False
             logging.basicConfig(level=logging.DEBUG)
 
-        spider = GrabProxies(thread_number=(multiprocessing.cpu_count() + 1))
-        spider.setup_plugins(GoogleSearchEngine(), YandexSearchEngine())
-        spider.initial()
-        spider.run()
-
-        if settings.DEBUG:
-            print spider.render_stats()
-
-        check_proxies()
+        grab_proxies()

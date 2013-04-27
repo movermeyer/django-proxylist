@@ -14,6 +14,7 @@ from django_countries import CountryField
 from django.core.cache import cache
 from django.db import models
 
+from proxylist.defaults import PROXY_LIST_MAX_CHECK_INTERVAL as max_check
 from proxylist import now
 import defaults
 
@@ -124,7 +125,8 @@ class Mirror(models.Model):
             proxy='%s:%d' % (proxy.hostname, proxy.port),
             proxy_type=proxy.proxy_type,
             proxy_userpwd=auth,
-            user_agent=defaults.PROXY_LIST_USER_AGENT
+            user_agent=defaults.PROXY_LIST_USER_AGENT,
+            hammer_mode=False,
         )
         g.go(str(self.url))
         return g.response.body
@@ -309,7 +311,7 @@ class Proxy(models.Model):
                 ))
 
         if not self.next_check:
-            self._update_next_check()
+            self.next_check = (now() - timedelta(seconds=max_check))
 
         super(Proxy, self).save(*args, **kwargs)
 

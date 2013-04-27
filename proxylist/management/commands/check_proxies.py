@@ -3,6 +3,7 @@
 from random import choice
 
 from django.core.management.base import BaseCommand
+from django.conf import settings
 
 from proxylist.models import Proxy, Mirror
 from proxylist import now
@@ -18,7 +19,8 @@ def check_proxies():
             try:
                 m.check(p)
             except Exception, msg:
-                print('%s - %s' % (str(p), msg))
+                if settings.DEBUG:
+                    print('%s - %s' % (str(p), msg))
 
 
 class Command(BaseCommand):
