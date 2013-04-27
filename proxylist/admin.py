@@ -17,25 +17,34 @@ import defaults
 
 
 class ProxyAdmin(admin.ModelAdmin):
-    list_display = ('hostname', 'port', 'country', 'anonymity_level',
-                    'proxy_type', 'last_check', 'errors',)
+    list_display = ('hostname', 'port', 'elapsed_time', 'country',
+                    'anonymity_level', 'proxy_type', 'created',
+                    'last_check', 'errors',)
     list_filter = ('anonymity_level', 'proxy_type', 'country',)
     search_fields = ('=hostname', '=port', 'country',)
     list_per_page = 25
 
     def changelist_view(self, request, extra_context=None):
-        if defaults.PROXY_LIST_USE_CALLERY:
+        if defaults.PROXY_LIST_USE_CELERY:
             self.change_list_template = 'proxylist/admin/change_list_link.html'
 
         return super(ProxyAdmin, self).changelist_view(
             request, extra_context=extra_context)
 
     def _proxies_view(self, request, title, task):
-        task.delay()
+        if Mirror.objects.all().count():
+            task.delay()
+            message = str(
+                'Your request was added to queue. Click Back button in '
+                'your browser and periodically refresh the page.'
+            )
+        else:
+            message = 'No mirrors found. At first you should add it.'
         return render(
             request, 'proxylist/admin/proxylist.html', {
                 'app_label': self.model._meta.app_label,
-                'title': title
+                'title': title,
+                'message': message
             }
         )
 

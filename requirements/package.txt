@@ -6,4 +6,4 @@ python-dateutil
 pygeoip
 pycurl
 lxml
-grab
+grab==0.4.8

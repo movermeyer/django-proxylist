@@ -4,13 +4,11 @@ Django-ProxyList-For-Grab
 .. image:: https://api.travis-ci.org/gotlium/django-proxylist.png?branch=master
     :alt: Build Status
     :target: https://travis-ci.org/gotlium/django-proxylist
-.. image:: https://coveralls.io/repos/gotlium/django-proxylist/badge.png?branch=master
-    :alt: Coverage
-    :target: https://coveralls.io/r/gotlium/django-proxylist
 
 This application is useful for keep an updated list of proxy servers, it
 contains everything you need to make periodic checks to verify the properties
-of the proxies.
+of the proxies. Also you can periodically collect the proxy server
+from the Internet, remove broken and slow proxies.
 
 
 
@@ -84,6 +82,16 @@ If you don't want to use `south` you can make a plain *syncdb*:
 
 
 
+Basic setup
+-----------
+
+At first, add a mirror. For working mirror, you need to install app on
+server with external ip. This is in order to be able to verify the correctness
+of data through proxy server. After adding mirror, you can add and test
+your proxies.
+
+
+
 Asynchronously checking
 -----------------------
 `django-proxylist-for-grab` has configured by default to non-async check.
@@ -126,8 +134,8 @@ Add the 'djcelery' application to 'INSTALLED_APPS' in settings
 
 
 
-Command reference
------------------
+Command line reference
+----------------------
 
 update_proxies
 ~~~~~~~~~~~~~~

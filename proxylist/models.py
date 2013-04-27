@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import socket
+import random
 import json
 import os
 
@@ -129,7 +130,7 @@ class Mirror(models.Model):
             hammer_mode=False,
         )
         g.go(str(self.url))
-        return g.response.body
+        return g.response
 
     def _parse_plm_v1(self, res, raw_data):
         """ Parse data from a ProxyList Mirror v1.0 output and fill a
@@ -166,6 +167,15 @@ class Mirror(models.Model):
     def is_checking(self, proxy):
         return bool(cache.get("proxy.%s.check" % proxy.pk))
 
+    def _get_elapsed_time(self, proxy):
+        time = []
+        for i in range(random.choice(range(3, 15))):
+            try:
+                time.append(self._make_request(proxy).time)
+            except:
+                pass
+        return sum(time) / float(len(time))
+
     def _check(self, proxy):
         """Do a proxy check"""
 
@@ -176,7 +186,12 @@ class Mirror(models.Model):
             res.proxy = proxy
             res.mirror = self
             res.check_start = now()
-            raw_data = self._make_request(proxy)
+            response = self._make_request(proxy)
+            raw_data = response.body
+            try:
+                elapsed_time = '%1.2f' % self._get_elapsed_time(proxy)
+            except:
+                elapsed_time = response.time
             res.check_end = now()
             res.raw_response = raw_data
 
@@ -185,7 +200,7 @@ class Mirror(models.Model):
             else:
                 raise Exception('Output type not found!')
 
-            proxy.update_from_check(res)
+            proxy.update_from_check(res, elapsed_time)
 
             res.save()
 
@@ -198,7 +213,7 @@ class Mirror(models.Model):
             cache.delete(check_key)
 
     def check(self, proxy):
-        if defaults.PROXY_LIST_USE_CALLERY:
+        if defaults.PROXY_LIST_USE_CELERY:
             from proxylist.tasks import async_check
 
             check_key = "proxy.%s.check" % proxy.pk
@@ -264,7 +279,12 @@ class Proxy(models.Model):
 
     next_check = models.DateTimeField(null=True, blank=True)
 
+    created = models.DateTimeField(
+        auto_now=False, auto_now_add=True, db_index=True, editable=False)
+
     errors = models.PositiveIntegerField(default=0, editable=False)
+
+    elapsed_time = models.FloatField(blank=True, null=True, editable=False)
 
     def _update_next_check(self):
         """ Calculate and set next check time """
@@ -279,7 +299,7 @@ class Proxy(models.Model):
         else:
             self.next_check = now() + timedelta(seconds=delay)
 
-    def update_from_check(self, check):
+    def update_from_check(self, check, elapsed_time):
         """ Update data from a ProxyCheckResult """
 
         if check.check_start:
@@ -289,6 +309,7 @@ class Proxy(models.Model):
         self.errors = 0
         self.anonymity_level = check.anonymity()
         self._update_next_check()
+        self.elapsed_time = elapsed_time
         self.save()
 
     def update_from_error(self):
