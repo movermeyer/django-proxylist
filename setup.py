@@ -37,6 +37,6 @@ setup(
         'django',
         'pycurl',
         'lxml',
-        'grab',
+        'grab == 0.4.8',
     ]
 )
