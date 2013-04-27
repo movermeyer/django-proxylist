@@ -36,7 +36,7 @@ setup(
         'pygeoip',
         'django',
         'pycurl',
-        'grab',
         'lxml',
+        'grab',
     ]
 )
