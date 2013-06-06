@@ -237,4 +237,4 @@ GrabLib Spider example:
 
 
 
-* Gihub: https://github.com/gotlium/django-proxylist
+* GitHub: https://github.com/gotlium/django-proxylist

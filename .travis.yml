@@ -12,7 +12,7 @@ install:
   - pip install -e . --use-mirrors
   - pip install -r requirements/tests.txt Django==$DJANGO --use-mirrors
 before_script:
-  - flake8 --exclude=migrations --ignore="W801" proxylist
+  - flake8 --exclude=migrations --ignore="W801,W402" proxylist
 script:
   - coverage run --branch --source=proxylist `which django-admin.py` test proxylist
   - coverage report --omit="proxylist/test*,proxylist/migrations/*,proxylist/management/*"
