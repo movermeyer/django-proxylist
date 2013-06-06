@@ -8,3 +8,6 @@ def now():
     except ImportError:
         pass
     return now()
+
+
+import signals

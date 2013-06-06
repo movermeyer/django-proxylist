@@ -9,6 +9,30 @@ from optparse import make_option
 from proxylist.models import Proxy
 
 
+class ProcessFile(object):
+    def __init__(self, filename, proxy_type='http'):
+        self.filename = filename
+        self.proxy_type = proxy_type
+
+    def get_data(self, line):
+        line = line.strip()
+        if '@' in line:
+            proxy, auth = line.split('@', 2)
+            return proxy.split(':') + auth.split(':')
+        return line.split(':', 2) + ['', '']
+
+    def save(self, hostname, port, user, password):
+        Proxy.objects.get_or_create(
+            hostname=hostname, port=port, user=user, password=password,
+            proxy_type=self.proxy_type
+        )
+
+    def run(self):
+        with open(self.filename) as f:
+            for proxy in f:
+                self.save(*self.get_data(proxy))
+
+
 class Command(BaseCommand):
     args = '<hidemyass proxy list files>'
     help = 'Update proxy list from file(s)'
@@ -21,13 +45,6 @@ class Command(BaseCommand):
             help='http, https, socks4, socks5'),
     )
 
-    def get_data(self, line):
-        line = line.strip()
-        if '@' in line:
-            proxy, auth = line.split('@', 2)
-            return proxy.split(':') + auth.split(':')
-        return line.split(':', 2) + ['', '']
-
     def handle(self, *args, **options):
         for filename in args:
             if not os.path.isfile(filename):
@@ -36,17 +53,4 @@ class Command(BaseCommand):
 
             self.stdout.write("Loading %s...\n" % filename)
 
-            with open(filename, 'r') as f:
-                for proxy in f:
-                    hostname, port, user, password = self.get_data(proxy)
-
-                    try:
-                        port = int(port)
-                    except ValueError:
-                        self.stderr.write("Invalid port %s value" % port)
-                        continue
-
-                    Proxy.objects.get_or_create(
-                        hostname=hostname, port=port,
-                        user=user, password=password,
-                        proxy_type=options['type'])
+            ProcessFile(filename, options['type']).run()

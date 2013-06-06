@@ -11,8 +11,9 @@ if VERSION[1] < 5:
 else:
     from django.conf.urls import patterns, url
 
-from proxylist.models import Proxy, Mirror, ProxyCheckResult
+from proxylist.models import Proxy, Mirror, ProxyCheckResult, Upload
 from proxylist import tasks
+
 import defaults
 
 
@@ -107,6 +108,14 @@ class MirrorAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
+class UploadAdmin(admin.ModelAdmin):
+    list_display = ('file_name', 'proxy_type', 'created', 'id',)
+    list_filter = ('created', 'proxy_type')
+    search_fields = ('file_name',)
+    list_per_page = 25
+
+
+admin.site.register(Upload, UploadAdmin)
 admin.site.register(Mirror, MirrorAdmin)
 admin.site.register(Proxy, ProxyAdmin)
 

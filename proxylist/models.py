@@ -17,6 +17,7 @@ from django.db import models
 
 from proxylist.defaults import PROXY_LIST_MAX_CHECK_INTERVAL as max_check
 from proxylist import now
+
 import defaults
 
 
@@ -24,6 +25,13 @@ ANONYMITY_NONE = 0
 ANONYMITY_LOW = 1
 ANONYMITY_MEDIUM = 2
 ANONYMITY_HIGH = 3
+
+PROXY_TYPE_CHOICES = (
+    ('http', 'HTTP'),
+    ('https', 'HTTPS'),
+    ('socks4', 'SOCKS4'),
+    ('socks5', 'SOCKS5'),
+)
 
 
 class ProxyCheckResult(models.Model):
@@ -233,13 +241,6 @@ class Proxy(models.Model):
 
     _geoip = GeoIP(defaults.PROXY_LIST_GEOIP_PATH)
 
-    proxy_type_choices = (
-        ('http', 'HTTP'),
-        ('https', 'HTTPS'),
-        ('socks4', 'SOCKS4'),
-        ('socks5', 'SOCKS5'),
-    )
-
     anonymity_level_choices = (
         # Anonymity can't be determined
         (None, 'Unknown'),
@@ -269,7 +270,7 @@ class Proxy(models.Model):
     country = CountryField(blank=True, editable=False)
 
     proxy_type = models.CharField(
-        default='http', max_length=10, choices=proxy_type_choices)
+        default='http', max_length=10, choices=PROXY_TYPE_CHOICES)
 
     anonymity_level = models.PositiveIntegerField(
         null=True, default=ANONYMITY_NONE, choices=anonymity_level_choices,
@@ -343,3 +344,13 @@ class Proxy(models.Model):
 
     def __unicode__(self):
         return "%s://%s:%s" % (self.proxy_type, self.hostname, self.port)
+
+
+class Upload(models.Model):
+    file_name = models.FileField(
+        upload_to='proxies',
+        help_text='File format: proxy:port@user:password')
+    created = models.DateTimeField(
+        auto_now=False, auto_now_add=True, editable=False)
+    proxy_type = models.CharField(
+        default='http', max_length=10, choices=PROXY_TYPE_CHOICES)
