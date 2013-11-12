@@ -120,12 +120,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 'grappelli',
+    'grappelli',
     'django.contrib.admin',
 
-    # 'south',
-    'djcelery',
+    'django_extensions',
     'proxylist',
+    # 'djcelery',
+    'south',
+    'test',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -6,7 +6,7 @@
 Welcome to Django-ProxyList's documentation!
 ============================================
 
-`django-proxylist` is a reusable app for maintain an up-to-date 
+`django-proxylist-for-grab` is a reusable app for maintain an up-to-date
 (through checking) list of proxy servers.
 
 Contents:

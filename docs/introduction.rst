@@ -4,7 +4,7 @@ Introduction
 Checking proxies
 ----------------
 
-Proxy checking is the core of `django-proxylist`, in order to make it you need
+Proxy checking is the core of `django-proxylist-for-grab`, in order to make it you need
 three things:
 
 * A checker: It shots a request throught the proxy.

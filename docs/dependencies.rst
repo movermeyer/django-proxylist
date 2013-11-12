@@ -1,7 +1,7 @@
 Dependencies
 ============
 
-`django-proxylist` depends on:
+`django-proxylist-for-grab` depends on:
 
 Packages
 --------
@@ -29,7 +29,7 @@ you can alter this behaviour changing the **PROXYLIST_CACHE** variable.
 Database
 ~~~~~~~~
 
-`django-proxilist` does not depends on any database backend by itself, but if
+`django-proxylist-for-grab` does not depends on any database backend by itself, but if
 you have a big list of proxies and you want to check it at sorts intervals
 you should avoid `SQLite`.
 

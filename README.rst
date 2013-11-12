@@ -4,6 +4,15 @@ Django-ProxyList-For-Grab
 .. image:: https://api.travis-ci.org/gotlium/django-proxylist.png?branch=master
     :alt: Build Status
     :target: https://travis-ci.org/gotlium/django-proxylist
+.. image:: https://coveralls.io/repos/gotlium/django-proxylist/badge.png?branch=master
+    :target: https://coveralls.io/r/gotlium/django-proxylist?branch=master
+.. image:: https://pypip.in/v/django-proxylist-for-grab/badge.png
+    :alt: Current version on PyPi
+    :target: https://crate.io/packages/django-proxylist-for-grab/
+.. image:: https://pypip.in/d/django-proxylist-for-grab/badge.png
+    :alt: Downloads from PyPi
+    :target: https://crate.io/packages/django-proxylist-for-grab/
+
 
 This application is useful for keep an updated list of proxy servers, it
 contains everything you need to make periodic checks to verify the properties
@@ -195,9 +204,9 @@ GrabLib usage example:
         print grab.response.body.strip()
 
     # Get count of div on google page
-    grab.go('http://www.google.com/')
+    grab.go('http://www.ya.ru/')
     if grab.response.code == 200:
-        print len(grab.xpath_list('//div'))
+        print grab.doc.select('//script').number()
 
 
 
@@ -215,16 +224,17 @@ GrabLib Spider example:
 
 
     class SimpleSpider(Spider):
-        initial_urls = ['http://ya.ru/']
+        initial_urls = ['http://www.lib.ru/']
 
         def task_initial(self, grab, task):
-            grab.set_input('text', 'linux')
+            grab.set_input('Search', 'linux')
             grab.submit(make_request=False)
             yield Task('search', grab=grab)
 
         def task_search(self, grab, task):
-            for elem in grab.xpath_list('//h2/a'):
-                print elem.text_content()
+            if grab.doc.select('//b/a/font/b').exists():
+                for elem in grab.doc.select('//b/a/font/b/text()'):
+                    print elem.text()
 
 
     class Command(BaseCommand):
@@ -238,3 +248,8 @@ GrabLib Spider example:
 
 
 * GitHub: https://github.com/gotlium/django-proxylist
+
+
+.. image:: https://d2weczhvl823v0.cloudfront.net/gotlium/django-proxylist/trend.png
+   :alt: Bitdeli badge
+   :target: https://bitdeli.com/free

@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-proxylist-for-grab',
-    version="0.4.0",
+    version="0.4.1",
     description='Proxy-list management application for Django',
     keywords='django proxylist grab',
     long_description=open('README.rst').read(),
@@ -29,6 +29,8 @@ setup(
     packages=find_packages(exclude=['demo']),
     package_data={'proxylist': [
         'data/agents.txt',
+        'templates/proxylist/admin/*.html',
+        'locale/*/LC_MESSAGES/*.po'
     ]},
     include_package_data=True,
     zip_safe=False,
@@ -40,6 +42,6 @@ setup(
         'django',
         'pycurl',
         'lxml',
-        'grab == 0.4.8',
+        'grab',
     ]
 )

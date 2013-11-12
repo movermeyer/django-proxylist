@@ -5,17 +5,17 @@ Installation
 Installing the package
 ----------------------
 
-`django-proxylist` can be easily installed using pip:
+`django-proxylist-for-grab` can be easily installed using pip:
 
 .. code-block:: bash
 
-   $ pip install django-proxylist
+   $ pip install django-proxylist-for-grab
 
 
 Configuration
 -------------
 
-After that you need to include `django-proxylist` into your *INSTALLED_APPS*
+After that you need to include `django-proxylist-for-grab` into your *INSTALLED_APPS*
 list of your django settings file.
 
 .. code-block:: python
@@ -27,7 +27,7 @@ list of your django settings file.
    )
 
 
-`django-proxylist` has a list of variables that you can configure throught
+`django-proxylist-for-grab` has a list of variables that you can configure throught
 django's settings file. You can see the entire list at Advanced Configuration.
 
 Database creation
@@ -39,7 +39,7 @@ Using south
 ~~~~~~~~~~~
 
 We encourage you using `south` for your database migrations. If you
-already use it you can migrate `django-proxylist`:
+already use it you can migrate `django-proxylist-for-grab`:
 
 .. code-block:: bash
 
