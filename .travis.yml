@@ -24,4 +24,4 @@ branches:
   only:
     - master
     - development
-after_success: coveralls  --exclude proxylist/migrations --exclude proxylist/management --exclude proxylist/test*
+after_success: coveralls

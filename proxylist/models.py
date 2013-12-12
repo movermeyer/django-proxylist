@@ -179,7 +179,7 @@ class Mirror(models.Model):
         time = []
         for i in range(random.choice(range(3, 15))):
             try:
-                time.append(self._make_request(proxy).time)
+                time.append(self._make_request(proxy).total_time)
             except:
                 pass
         return sum(time) / float(len(time))
@@ -199,7 +199,7 @@ class Mirror(models.Model):
             try:
                 elapsed_time = '%1.2f' % self._get_elapsed_time(proxy)
             except:
-                elapsed_time = response.time
+                elapsed_time = response.total_time
             res.check_end = now()
             res.raw_response = raw_data
 
