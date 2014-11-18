@@ -262,7 +262,7 @@ class Proxy(models.Model):
         (ANONYMITY_HIGH, 'High'),
     )
 
-    hostname = models.CharField(max_length=75, unique=True)
+    hostname = models.CharField(max_length=75)
     port = models.PositiveIntegerField()
     user = models.CharField(blank=True, null=True, max_length=50)
     password = models.CharField(blank=True, null=True, max_length=50)
@@ -341,6 +341,7 @@ class Proxy(models.Model):
         verbose_name = 'Proxy'
         verbose_name_plural = 'Proxies'
         ordering = ('-last_check',)
+        unique_together = (('hostname', 'port'),)
 
     def __unicode__(self):
         return "%s://%s:%s" % (self.proxy_type, self.hostname, self.port)
