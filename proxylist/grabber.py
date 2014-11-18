@@ -28,9 +28,8 @@ def get_proxies():
     return proxies
 
 
-def Grab(**kwargs):
-    grb = GrabLib()
-    default_settings = {
+def get_default_settings():
+    return {
         'user_agent_file': USER_AGENT_FILE,
         'connect_timeout': defaults.GRABBER_CONNECT_TIMEOUT,
         'timeout': defaults.GRABBER_TIMEOUT,
@@ -38,6 +37,11 @@ def Grab(**kwargs):
         'hammer_timeouts': defaults.GRABBER_HAMMER_TIMEOUTS,
         'headers': defaults.GRABBER_HEADERS
     }
+
+
+def Grab(**kwargs):
+    grb = GrabLib()
+    default_settings = get_default_settings()
     use_proxy = kwargs.pop('use_db_proxy', True)
     default_settings.update(kwargs)
     grb.setup(**default_settings)
