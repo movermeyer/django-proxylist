@@ -38,14 +38,16 @@ def Grab(**kwargs):
         'hammer_timeouts': defaults.GRABBER_HAMMER_TIMEOUTS,
         'headers': defaults.GRABBER_HEADERS
     }
+    use_proxy = kwargs.pop('use_db_proxy', True)
     default_settings.update(kwargs)
     grb.setup(**default_settings)
-    grb.load_proxylist(
-        source=get_proxies(),
-        source_type='list',
-        auto_init=True,
-        auto_change=True
-    )
+    if use_proxy is True:
+        grb.load_proxylist(
+            source=get_proxies(),
+            source_type='list',
+            auto_init=True,
+            auto_change=True
+        )
     return grb
 
 
