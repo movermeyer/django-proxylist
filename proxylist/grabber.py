@@ -39,20 +39,23 @@ def get_default_settings():
     }
 
 
-def Grab(**kwargs):
-    grb = GrabLib()
-    default_settings = get_default_settings()
-    use_proxy = kwargs.pop('use_db_proxy', True)
-    default_settings.update(kwargs)
-    grb.setup(**default_settings)
-    if use_proxy is True:
-        grb.load_proxylist(
-            source=get_proxies(),
-            source_type='list',
-            auto_init=True,
-            auto_change=True
-        )
-    return grb
+class Grab(GrabLib):
+    def __init__(self, *args, **kwargs):
+        default_settings = get_default_settings()
+        use_proxy = kwargs.pop('use_db_proxy', True)
+        default_settings.update(kwargs)
+
+        kwargs.update(default_settings)
+
+        super(Grab, self).__init__(*args, **kwargs)
+
+        if use_proxy is True:
+            self.load_proxylist(
+                source=get_proxies(),
+                source_type='list',
+                auto_init=True,
+                auto_change=True
+            )
 
 
 class Spider(spider.base.Spider):
