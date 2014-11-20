@@ -2,7 +2,7 @@
 
 import os
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 
 from grab import spider, Grab as GrabLib
 
@@ -14,17 +14,31 @@ APP_ROOT = os.path.normpath(os.path.dirname(__file__))
 USER_AGENT_FILE = os.path.join(APP_ROOT, 'data/agents.txt')
 
 
-def get_proxies():
-    proxies = []
-    proxies_list = models.Proxy.objects.filter(
-        errors=0, last_check__isnull=False)
+class ActiveProxiesNotFound(Exception):
+    """
+    Raised when not active proxies found on database
+    """
+
+
+def get_db_proxies(db_cache_ttl=10, grabber_cache_key='grabber_proxies_list'):
+    cached = cache.get(grabber_cache_key)
+    if cached:
+        return cached
+
+    proxies_list = models.Proxy.objects.values(
+        'hostname', 'port', 'user', 'password'
+    ).filter(errors=0, last_check__isnull=False)
+
     if not proxies_list.exists():
-        raise ObjectDoesNotExist('Active proxy not found!')
+        raise ActiveProxiesNotFound
+
+    proxies = []
     for obj in proxies_list:
-        proxy = '%s:%d' % (obj.hostname, obj.port)
-        if obj.user and obj.password:
-            proxy += ':%s:%s' % (obj.user, obj.password)
+        proxy = '%s:%d' % (obj['hostname'], obj['port'])
+        if obj['user'] and obj['password']:
+            proxy += ':%s:%s' % (obj['user'], obj['password'])
         proxies.append(proxy)
+    cache.set(grabber_cache_key, proxies, db_cache_ttl)
     return proxies
 
 
@@ -41,17 +55,17 @@ def get_default_settings():
 
 class Grab(GrabLib):
     def __init__(self, *args, **kwargs):
-        default_settings = get_default_settings()
+        db_cache_ttl = kwargs.pop('db_cache_ttl', 10)
         use_proxy = kwargs.pop('use_db_proxy', True)
+
+        default_settings = get_default_settings()
         default_settings.update(kwargs)
 
-        kwargs.update(default_settings)
-
-        super(Grab, self).__init__(*args, **kwargs)
+        super(Grab, self).__init__(*args, **default_settings)
 
         if use_proxy is True:
             self.load_proxylist(
-                source=get_proxies(),
+                source=get_db_proxies(db_cache_ttl),
                 source_type='list',
                 auto_init=True,
                 auto_change=True
