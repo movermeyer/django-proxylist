@@ -11,7 +11,7 @@ if VERSION[1] < 5:
 else:
     from django.conf.urls import patterns, url
 
-from proxylist.models import Proxy, Mirror, ProxyCheckResult, Upload
+from proxylist.models import Proxy, Mirror, ProxyCheckResult, Upload, ProxyList
 from proxylist import tasks
 
 import defaults
@@ -115,6 +115,11 @@ class UploadAdmin(admin.ModelAdmin):
     list_per_page = 25
 
 
+class ProxyListAdmin(admin.ModelAdmin):
+    list_display = ('url', 'update_period', 'next_check', 'created')
+
+
+admin.site.register(ProxyList, ProxyListAdmin)
 admin.site.register(Upload, UploadAdmin)
 admin.site.register(Mirror, MirrorAdmin)
 admin.site.register(Proxy, ProxyAdmin)

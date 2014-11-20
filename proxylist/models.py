@@ -355,3 +355,18 @@ class Upload(models.Model):
         auto_now=False, auto_now_add=True, editable=False)
     proxy_type = models.CharField(
         default='http', max_length=10, choices=PROXY_TYPE_CHOICES)
+
+
+class ProxyList(models.Model):
+    url = models.URLField(unique=True)
+    update_period = models.IntegerField(default=300)
+    next_check = models.DateTimeField(
+        null=True, blank=True, editable=False, auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return unicode(self.url)
+
+    class Meta:
+        verbose_name = 'Proxylist urls'
+        verbose_name_plural = 'Proxylist urls'
