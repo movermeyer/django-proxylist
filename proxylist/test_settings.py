@@ -13,6 +13,12 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -33,5 +39,5 @@ if VERSION[:2] < (1, 6):
     TEST_RUNNER = 'discover_runner.DiscoverRunner'
 USE_TZ = True
 
-GRABBER_TIMEOUT = 5
-GRABBER_CONNECT_TIMEOUT = 5
+GRABBER_TIMEOUT = 26
+GRABBER_CONNECT_TIMEOUT = 26

@@ -2,7 +2,6 @@
 
 import os
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
 from grab.error import GrabTimeoutError
@@ -14,18 +13,20 @@ from proxylist import now
 import defaults
 
 
+BASE_HOST = '109.233.213.58'
+BASE_PORT = 8080
+
+
 class ProxyListTestCase(TestCase):
     def setUp(self):
         self.proxies = [
             {
-                'user': 'proxylist',
-                'password': '1f3a3b28c1a0cc3f',
-                'hostname': 'fastun.ru',
-                'port': 7000,
+                'hostname': BASE_HOST,
+                'port': BASE_PORT,
             },
             {
                 'hostname': '7.7.7.7',
-                'port': 3128,
+                'port': 1234,
             }
         ]
         self.mirror_url = 'http://live-film.net/mirror'
@@ -47,14 +48,15 @@ class ProxyListTestCase(TestCase):
         self.assertEqual(self.mirror.all().count(), 1)
 
     def _check_grab(self, grab):
-        self.assertEqual(grab.config.get('proxy').split(':')[-1], '7000')
-        self.assertEqual(':7000' in grab.config.get('proxy'), True)
+        self.assertEqual(
+            grab.config.get('proxy').split(':')[-1], str(BASE_PORT))
+        self.assertEqual(':%d' % BASE_PORT in grab.config.get('proxy'), True)
         self.assertEqual(grab.response.code, 200)
-        # self.assertEqual(grab.doc.select('//html/body').exists(), True)
-        self.assertEqual(grab.xpath_exists('//html/body'), True)
+        self.assertEqual(grab.doc.select('//html/body').exists(), True)
 
     def test_a_settings_is_set(self):
-        self.assertRaises(ObjectDoesNotExist, grabber.get_proxies)
+        self.assertRaises(
+            grabber.ActiveProxiesNotFound, grabber.get_db_proxies)
 
     def test_b_setup_mirror(self):
         self._add_mirror()
@@ -70,29 +72,29 @@ class ProxyListTestCase(TestCase):
         check = lambda proxy: self.mirror.get(pk=1).check(proxy)
 
         # OK
-        check(proxy(7000))
+        check(proxy(BASE_PORT))
         self.assertEqual(self.logs.all().count(), 1)
         self.assertEqual(self.logs.get(pk=1).ip_reveal, False)
 
         # ERROR
-        self.assertRaises(GrabTimeoutError, check, proxy(3128))
+        self.assertRaises(GrabTimeoutError, check, proxy(1234))
         self.assertEqual(self.logs.all().count(), 1)
 
     def test_e_settings(self, **kwargs):
-        self.assertEqual(defaults.GRABBER_CONNECT_TIMEOUT, 5)
-        self.assertEqual(defaults.GRABBER_TIMEOUT, 5)
+        self.assertEqual(defaults.GRABBER_CONNECT_TIMEOUT, 26)
+        self.assertEqual(defaults.GRABBER_TIMEOUT, 26)
 
     def test_f_grab(self):
         from proxylist import grabber
 
         self._add_mirror()
-        self._add_proxies(7000)
+        self._add_proxies(BASE_PORT)
 
         self.assertEqual(os.path.isdir(grabber.APP_ROOT), True)
-        self.assertEqual(os.path.exists(grabber.USER_AGENT_FILE), True)
+        self.assertEqual(os.path.exists(grabber.PC_USER_AGENT_FILE), True)
 
-        self.assertEqual(len(grabber.get_proxies()), 1)
-        self.assertEqual('proxylist' in grabber.get_proxies()[0], True)
+        self.assertEqual(len(grabber.get_db_proxies()), 1)
+        self.assertEqual(BASE_HOST in grabber.get_db_proxies()[0], True)
 
         grab = grabber.Grab()
         grab.go('http://www.google.com/')
@@ -103,7 +105,7 @@ class ProxyListTestCase(TestCase):
         from proxylist.grabber import Spider
 
         self._add_mirror()
-        self._add_proxies(7000)
+        self._add_proxies(BASE_PORT)
 
         base = self
 

@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-proxylist-for-grab',
-    version="0.4.4",
+    version="0.5",
     description='Proxy-list management application for Django',
     keywords='django proxylist grab',
     long_description=open('README.rst').read(),

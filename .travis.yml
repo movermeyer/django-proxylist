@@ -17,9 +17,9 @@ script:
   - coverage report --omit="proxylist/test*,proxylist/migrations/*,proxylist/management/*"
 env:
   - DJANGO=1.3.7
-  - DJANGO=1.4.10
-  - DJANGO=1.5.5
-  - DJANGO=1.6
+  - DJANGO=1.4.16
+  - DJANGO=1.5.11
+  - DJANGO=1.6.8
 branches:
   only:
     - master
