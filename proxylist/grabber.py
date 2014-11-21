@@ -11,12 +11,13 @@ import models
 
 
 APP_ROOT = os.path.normpath(os.path.dirname(__file__))
-USER_AGENT_FILE = os.path.join(APP_ROOT, 'data/agents.txt')
+PC_USER_AGENT_FILE = os.path.join(APP_ROOT, 'data/pc_agents.txt')
+MOBILE_USER_AGENT_FILE = os.path.join(APP_ROOT, 'data/mobile_agents.txt')
 
 
 class ActiveProxiesNotFound(Exception):
     """
-    Raised when not active proxies found on database
+    Raised when active proxies not found on database
     """
 
 
@@ -42,9 +43,12 @@ def get_db_proxies(db_cache_ttl=10, grabber_cache_key='grabber_proxies_list'):
     return proxies
 
 
-def get_default_settings():
+def get_default_settings(mobile_devices=False):
+    user_agent_file = PC_USER_AGENT_FILE
+    if mobile_devices is True:
+        user_agent_file = MOBILE_USER_AGENT_FILE
     return {
-        'user_agent_file': USER_AGENT_FILE,
+        'user_agent_file': user_agent_file,
         'connect_timeout': defaults.GRABBER_CONNECT_TIMEOUT,
         'timeout': defaults.GRABBER_TIMEOUT,
         'hammer_mode': True,
@@ -55,10 +59,11 @@ def get_default_settings():
 
 class Grab(GrabLib):
     def __init__(self, *args, **kwargs):
+        mobile_device = kwargs.pop('mobile_devices', False)
         db_cache_ttl = kwargs.pop('db_cache_ttl', 10)
         use_proxy = kwargs.pop('use_db_proxy', True)
 
-        default_settings = get_default_settings()
+        default_settings = get_default_settings(mobile_device)
         default_settings.update(kwargs)
 
         super(Grab, self).__init__(*args, **default_settings)
