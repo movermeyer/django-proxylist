@@ -39,3 +39,7 @@ GRABBER_TIMEOUT = get_settings('GRABBER_TIMEOUT', 60)
 GRABBER_CONNECT_TIMEOUT = get_settings('GRABBER_CONNECT_TIMEOUT', 2)
 
 SPIDER_PAGE_END = get_settings('SPIDER_PAGE_END', 2)
+
+ADMIN_BUTTONS = get_settings('PROXY_ADMIN_BUTTONS', [
+    'Clean', 'Check', 'Grab'
+])

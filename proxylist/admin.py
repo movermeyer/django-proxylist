@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from django.core.cache import cache
 from django.shortcuts import render
 from django.contrib import admin
 from django.conf import settings
-
+from django.http import Http404
 from django import VERSION
 
 if VERSION[1] < 5:
@@ -28,7 +29,12 @@ class ProxyAdmin(admin.ModelAdmin):
     def changelist_view(self, request, extra_context=None):
         if defaults.PROXY_LIST_USE_CELERY:
             self.change_list_template = 'proxylist/admin/change_list_link.html'
-
+            btn = defaults.ADMIN_BUTTONS
+            cnx = dict(zip(btn, btn))
+            if extra_context:
+                extra_context.update(cnx)
+            else:
+                extra_context = cnx
         return super(ProxyAdmin, self).changelist_view(
             request, extra_context=extra_context)
 
@@ -50,12 +56,18 @@ class ProxyAdmin(admin.ModelAdmin):
         )
 
     def clean_proxies(self, request):
+        if 'Clean' not in defaults.ADMIN_BUTTONS:
+            raise Http404
         return self._proxies_view(request, 'Clean proxies', tasks.CleanProxies)
 
     def check_proxies(self, request):
+        if 'Check' not in defaults.ADMIN_BUTTONS:
+            raise Http404
         return self._proxies_view(request, 'Check proxies', tasks.CheckProxies)
 
     def grab_proxies(self, request):
+        if 'Grab' not in defaults.ADMIN_BUTTONS:
+            raise Http404
         return self._proxies_view(request, 'Grab proxies', tasks.GrabProxies)
 
     def get_urls(self):

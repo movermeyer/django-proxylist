@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.core.cache import cache
 from celery.task import Task
 from celery import task
 
@@ -10,15 +11,27 @@ from management.commands.grab_proxies import grab_proxies
 
 @task(ignore_result=True)
 def async_check(proxy, checker):
-    try:
-        checker._check(proxy)
-    except:
-        pass
+    checker._check(proxy)
+
+
+def run_and_lock(foo, task):
+    lock_key = str(task.__name__)
+
+    if cache.get(lock_key) is None:
+        cache.set(lock_key, True, 3600)
+        try:
+            foo()
+            cache.delete(lock_key)
+        except Exception:
+            cache.delete(lock_key)
+            raise
+    else:
+        print 'still working ...'
 
 
 class CleanProxies(Task):
     def run(self, *args, **kwargs):
-        clean_proxies()
+        run_and_lock(clean_proxies, self)
 
 
 class GrabProxies(Task):
@@ -26,9 +39,9 @@ class GrabProxies(Task):
     send_error_emails = False
 
     def run(self, *args, **kwargs):
-        grab_proxies()
+        run_and_lock(grab_proxies, self)
 
 
 class CheckProxies(Task):
     def run(self, *args, **kwargs):
-        check_proxies()
+        run_and_lock(check_proxies, self)
