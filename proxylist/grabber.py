@@ -73,7 +73,7 @@ class Grab(GrabLib):
                 source=get_db_proxies(db_cache_ttl),
                 source_type='list',
                 auto_init=True,
-                auto_change=True
+                auto_change=kwargs.get('proxy_auto_change', True)
             )
 
 
