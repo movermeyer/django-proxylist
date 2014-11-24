@@ -220,8 +220,8 @@ class Mirror(models.Model):
             # Task unlock
             cache.delete(check_key)
 
-    def check(self, proxy):
-        if defaults.PROXY_LIST_USE_CELERY:
+    def check(self, proxy, async=True):
+        if defaults.PROXY_LIST_USE_CELERY and async:
             from proxylist.tasks import async_check
 
             check_key = "proxy.%s.check" % proxy.pk
@@ -232,7 +232,7 @@ class Mirror(models.Model):
                 # Task lock
                 cache.add(check_key, "true", defaults.PROXY_LIST_CACHE_TIMEOUT)
 
-            return async_check.apply_async((proxy, self))
+            return async_check.apply_async((proxy.pk, self))
         return self._check(proxy)
 
 

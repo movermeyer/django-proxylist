@@ -10,8 +10,10 @@ from management.commands.grab_proxies import grab_proxies
 
 
 @task(ignore_result=True)
-def async_check(proxy, checker):
-    checker._check(proxy)
+def async_check(proxy_pk, checker):
+    from models import Proxy
+
+    checker._check(Proxy.objects.get(pk=proxy_pk))
 
 
 def run_and_lock(foo, task):
