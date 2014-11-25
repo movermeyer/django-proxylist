@@ -176,7 +176,8 @@ class Mirror(models.Model):
 
     def _get_elapsed_time(self, proxy):
         time = []
-        for i in range(random.choice(range(2, 6))):
+        req_range = CALCULATE_ELAPSED_TIME_REQUESTS_RANGE
+        for i in range(random.choice(req_range)):
             try:
                 time.append(self._make_request(proxy).total_time)
             except:
