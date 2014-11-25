@@ -11,7 +11,7 @@ from proxylist import now
 
 def check_proxies():
     mirrors = Mirror.objects.all()
-    proxies = Proxy.objects.filter(next_check__lte=now())
+    proxies = Proxy.objects.filter(next_check__lte=now()).order_by('errors')
 
     for p in proxies:
         m = choice(mirrors)
