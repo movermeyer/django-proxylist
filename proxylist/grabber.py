@@ -29,6 +29,10 @@ def get_db_proxies(db_cache_ttl=10, grabber_cache_key='grabber_proxies_list'):
     proxies_list = models.Proxy.objects.values(
         'hostname', 'port', 'user', 'password'
     ).filter(errors=0, last_check__isnull=False)
+    if defaults.PROXY_MIN_ANONYMITY_LEVEL:
+        proxies_list = proxies_list.filter(
+            anonymity_level__gte=defaults.PROXY_MIN_ANONYMITY_LEVEL
+        )
 
     if not proxies_list.exists():
         raise ActiveProxiesNotFound
