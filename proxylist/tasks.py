@@ -10,10 +10,11 @@ from management.commands.grab_proxies import grab_proxies
 
 
 @task(ignore_result=True)
-def async_check(proxy_pk, checker):
-    from models import Proxy
+def async_check(proxy_pk, mirror_pk):
+    from models import Proxy, Mirror
 
-    checker._check(Proxy.objects.get(pk=proxy_pk))
+    mirror = Mirror.objects.get(pk=mirror_pk)
+    mirror._check(Proxy.objects.get(pk=proxy_pk))
 
 
 def run_and_lock(foo, task):

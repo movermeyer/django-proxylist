@@ -5,7 +5,6 @@ import random
 import json
 import os
 
-from dateutil.parser import parse
 from datetime import timedelta
 from random import randint
 from pygeoip import GeoIP
@@ -16,7 +15,7 @@ from django.core.cache import cache
 from django.db import models
 
 from proxylist.defaults import PROXY_LIST_MAX_CHECK_INTERVAL as max_check
-from proxylist import now
+from proxylist import now, parse
 
 import defaults
 
@@ -177,7 +176,7 @@ class Mirror(models.Model):
 
     def _get_elapsed_time(self, proxy):
         time = []
-        for i in range(random.choice(range(3, 15))):
+        for i in range(random.choice(range(2, 6))):
             try:
                 time.append(self._make_request(proxy).total_time)
             except:
@@ -232,7 +231,7 @@ class Mirror(models.Model):
                 # Task lock
                 cache.add(check_key, "true", defaults.PROXY_LIST_CACHE_TIMEOUT)
 
-            return async_check.apply_async((proxy.pk, self))
+            return async_check.apply_async((proxy.pk, self.pk))
         return self._check(proxy)
 
 

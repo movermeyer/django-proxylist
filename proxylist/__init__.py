@@ -1,4 +1,6 @@
+from dateutil.parser import parse as _parse
 from datetime import datetime
+from django.conf import settings
 
 
 def now():
@@ -9,5 +11,10 @@ def now():
         pass
     return now()
 
+
+def parse(val):
+    if settings.USE_TZ:
+        return _parse(val)
+    return _parse(val).replace(tzinfo=None)
 
 import signals
