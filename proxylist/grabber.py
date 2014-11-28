@@ -64,8 +64,9 @@ def get_default_settings(mobile_devices=False):
 class Grab(GrabLib):
     def __init__(self, *args, **kwargs):
         mobile_device = kwargs.pop('mobile_devices', False)
-        db_cache_ttl = kwargs.pop('db_cache_ttl', 10)
         use_proxy = kwargs.pop('use_db_proxy', True)
+        db_cache_ttl = kwargs.pop(
+            'db_cache_ttl', defaults.PROXY_LIST_DB_CACHE_TTL)
 
         default_settings = get_default_settings(mobile_device)
         default_settings.update(kwargs)

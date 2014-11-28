@@ -342,6 +342,10 @@ class Proxy(models.Model):
         verbose_name_plural = 'Proxies'
         ordering = ('-last_check',)
         unique_together = (('hostname', 'port'),)
+        index_together = (
+            ('errors', 'last_check', 'anonymity_level'),
+            ('errors', 'last_check'),
+        )
 
     def __unicode__(self):
         return "%s://%s:%s" % (self.proxy_type, self.hostname, self.port)

@@ -35,7 +35,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'django-countries',
+        'django-countries==1.5',
         'python-dateutil',
         'multiprocessing',
         'pygeoip',

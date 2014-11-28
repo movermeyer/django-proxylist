@@ -9,7 +9,7 @@ from management.commands.clean_proxies import clean_proxies
 from management.commands.grab_proxies import grab_proxies
 
 
-@task(ignore_result=True)
+@task(ignore_result=True, time_limit=30)
 def async_check(proxy_pk, mirror_pk):
     from models import Proxy, Mirror
 
