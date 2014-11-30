@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
+import pickle
 
 from django.core.cache import cache
 
-from grab import spider, Grab as GrabLib
+from grab import spider, response, Grab as GrabLib
 
 import defaults
 import models
@@ -62,6 +63,12 @@ def get_default_settings(mobile_devices=False):
 
 
 class Grab(GrabLib):
+    response_keys = (
+        'status', 'code', 'head', 'body', 'total_time',
+        'connect_time', 'name_lookup_time',
+        'url', 'charset', '_unicode_body'
+    )
+
     def __init__(self, *args, **kwargs):
         mobile_device = kwargs.pop('mobile_devices', False)
         use_proxy = kwargs.pop('use_db_proxy', True)
@@ -80,6 +87,31 @@ class Grab(GrabLib):
                 auto_init=True,
                 auto_change=kwargs.get('proxy_auto_change', True)
             )
+
+    def dump_current_session(self):
+        if self.response:
+            data = {'config': self.dump_config(), 'response': {}}
+            for key in self.clonable_attributes:
+                data[key] = getattr(self, key)
+
+            data['response']['headers'] = self.response.headers
+            data['response']['cookies'] = self.response.cookies
+
+            for key in self.response_keys:
+                data['response'][key] = getattr(self.response, key)
+
+            return pickle.dumps(data)
+
+    def load_previous_session(self, session):
+        session = pickle.loads(session)
+        _response = session.pop('response')
+        self.response = response.Response()
+
+        for k, v in session.items():
+            setattr(self, k, v)
+
+        for k, v in _response.items():
+            setattr(self.response, k, v)
 
 
 class Spider(spider.base.Spider):
