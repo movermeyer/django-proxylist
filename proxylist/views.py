@@ -2,22 +2,14 @@
 
 import json
 
+from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
 
 from proxylist import now
 
 
+@never_cache
 def mirror(request):
-    """
-    from dateutil.parser import parse
-    from dateutil.tz import tzoffset
-    from datetime import datetime
-
-    parse("2012-12-28 22:22:12.868342+04:00")
-    datetime(2012, 12, 28, 22, 22, 12, 868342,
-             tzinfo=tzoffset(None, 14400))
-    """
-
     start = now()
 
     SERIALIZABLE = (str, unicode, bool, int, float)
