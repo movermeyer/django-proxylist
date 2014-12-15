@@ -4,7 +4,7 @@ import os
 
 from django.test import TestCase
 
-from grab.error import GrabTimeoutError
+from grab.error import GrabConnectionError
 
 from proxylist import grabber
 from proxylist import models
@@ -14,7 +14,7 @@ import defaults
 
 
 BASE_HOST = '127.0.0.1'
-BASE_PORT = 3128
+BASE_PORT = 8888
 
 
 class ProxyListTestCase(TestCase):
@@ -77,7 +77,7 @@ class ProxyListTestCase(TestCase):
         self.assertEqual(self.logs.get(pk=1).ip_reveal, False)
 
         # ERROR
-        self.assertRaises(GrabTimeoutError, check, proxy(1234))
+        self.assertRaises(GrabConnectionError, check, proxy(1234))
         self.assertEqual(self.logs.all().count(), 1)
 
     def test_e_settings(self, **kwargs):

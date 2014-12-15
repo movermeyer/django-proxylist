@@ -1,6 +1,6 @@
-from dateutil.parser import parse as _parse
 from datetime import datetime
-from django.conf import settings
+
+default_app_config = 'proxylist.apps.ProxylistConfig'
 
 
 def now():
@@ -13,8 +13,15 @@ def now():
 
 
 def parse(val):
+    from dateutil.parser import parse as _parse
+    from django.conf import settings
+
     if settings.USE_TZ:
         return _parse(val)
     return _parse(val).replace(tzinfo=None)
 
-import signals
+
+try:
+    import signals
+except ImportError:
+    pass

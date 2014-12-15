@@ -13,7 +13,10 @@ else:
     from django.conf.urls import patterns, url
 
 from proxylist.models import Proxy, Mirror, ProxyCheckResult, Upload, ProxyList
-from proxylist import tasks
+try:
+    from proxylist import tasks
+except ImportError:
+    pass
 
 import defaults
 

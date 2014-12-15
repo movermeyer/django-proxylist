@@ -39,6 +39,7 @@ setup(
         'python-dateutil',
         'multiprocessing',
         'pygeoip',
+        'celery',
         'pycurl',
         'lxml',
         'grab',
