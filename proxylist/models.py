@@ -10,11 +10,16 @@ from random import randint
 from pygeoip import GeoIP
 from grab import Grab
 
-from django_countries import CountryField
 from django.core.cache import cache
 from django.db import models
 
+try:
+    from django_countries import CountryField
+except ImportError:
+    from django_countries.fields import CountryField
+
 from proxylist.defaults import PROXY_LIST_MAX_CHECK_INTERVAL as max_check
+from proxylist.defaults import CALCULATE_ELAPSED_TIME_REQUESTS_RANGE
 from proxylist import now, parse
 
 import defaults
@@ -184,7 +189,7 @@ class Mirror(models.Model):
                 pass
         return sum(time) / float(len(time))
 
-    def _check(self, proxy):
+    def _check_proxy(self, proxy):
         """Do a proxy check"""
 
         check_key = "proxy.%s.check" % proxy.pk
@@ -220,7 +225,7 @@ class Mirror(models.Model):
             # Task unlock
             cache.delete(check_key)
 
-    def check(self, proxy, async=True):
+    def check_proxy(self, proxy, async=True):
         if defaults.PROXY_LIST_USE_CELERY and async:
             from proxylist.tasks import async_check
 
@@ -233,7 +238,7 @@ class Mirror(models.Model):
                 cache.add(check_key, "true", defaults.PROXY_LIST_CACHE_TIMEOUT)
 
             return async_check.apply_async((proxy.pk, self.pk))
-        return self._check(proxy)
+        return self._check_proxy(proxy)
 
 
 class Proxy(models.Model):
@@ -267,7 +272,7 @@ class Proxy(models.Model):
     user = models.CharField(blank=True, null=True, max_length=50)
     password = models.CharField(blank=True, null=True, max_length=50)
 
-    country = CountryField(blank=True, editable=False)
+    country = CountryField(null=True, blank=True, editable=False)
 
     proxy_type = models.CharField(
         default='http', max_length=10, choices=PROXY_TYPE_CHOICES)

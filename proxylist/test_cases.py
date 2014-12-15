@@ -13,8 +13,8 @@ from proxylist import now
 import defaults
 
 
-BASE_HOST = '109.233.213.58'
-BASE_PORT = 8080
+BASE_HOST = '127.0.0.1'
+BASE_PORT = 3128
 
 
 class ProxyListTestCase(TestCase):
@@ -69,7 +69,7 @@ class ProxyListTestCase(TestCase):
         self._add_proxies()
 
         proxy = lambda port: self.proxy.get(port=port)
-        check = lambda proxy: self.mirror.get(pk=1).check(proxy)
+        check = lambda proxy: self.mirror.get(pk=1).check_proxy(proxy)
 
         # OK
         check(proxy(BASE_PORT))

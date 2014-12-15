@@ -14,7 +14,7 @@ def async_check(proxy_pk, mirror_pk):
     from models import Proxy, Mirror
 
     mirror = Mirror.objects.get(pk=mirror_pk)
-    mirror._check(Proxy.objects.get(pk=proxy_pk))
+    mirror._check_proxy(Proxy.objects.get(pk=proxy_pk))
 
 
 def run_and_lock(foo, task):

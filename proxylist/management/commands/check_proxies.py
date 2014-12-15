@@ -17,7 +17,7 @@ def check_proxies():
         m = choice(mirrors)
         if not m.is_checking(p):
             try:
-                m.check(p)
+                m.check_proxy(p)
             except Exception, msg:
                 if settings.DEBUG:
                     print('%s - %s' % (str(p), msg))
