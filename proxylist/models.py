@@ -10,6 +10,7 @@ from random import randint
 from pygeoip import GeoIP
 from grab import Grab
 
+from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.db import models
 from django import VERSION
@@ -19,11 +20,8 @@ try:
 except ImportError:
     from django_countries.fields import CountryField
 
-from proxylist.defaults import PROXY_LIST_MAX_CHECK_INTERVAL as max_check
-from proxylist.defaults import CALCULATE_ELAPSED_TIME_REQUESTS_RANGE
 from proxylist import now, parse
-
-import defaults
+from proxylist import defaults
 
 
 ANONYMITY_NONE = 0
@@ -42,45 +40,52 @@ PROXY_TYPE_CHOICES = (
 class ProxyCheckResult(models.Model):
     """The result of a proxy check"""
 
-    mirror = models.ForeignKey('Mirror')
+    mirror = models.ForeignKey('Mirror', verbose_name=_('Mirror'))
 
-    proxy = models.ForeignKey('Proxy')
+    proxy = models.ForeignKey('Proxy', verbose_name=_('Proxy'))
 
     #: Our real outbound IP Address (from worker)
-    real_ip_address = models.IPAddressField(blank=True, null=True)
+    real_ip_address = models.IPAddressField(
+        _('Real IP address'), blank=True, null=True)
 
     #: Proxy outbound IP Address (received from mirror)
-    hostname = models.CharField(max_length=25, blank=True, null=True)
+    hostname = models.CharField(
+        _('Hostname'), max_length=25, blank=True, null=True)
 
     #: True if we found proxy related http headers
-    forwarded = models.BooleanField(default=True)
+    forwarded = models.BooleanField(_('Forwarded'), default=True)
 
     #: True if `real_ip_address` was found at any field
-    ip_reveal = models.BooleanField(default=True)
+    ip_reveal = models.BooleanField(_('IP reveal'), default=True)
 
     #: Check starts
-    check_start = models.DateTimeField()
+    check_start = models.DateTimeField(_('Check start'))
 
     #: Request was received at mirror server
-    response_start = models.DateTimeField()
+    response_start = models.DateTimeField(_('Response start'))
 
     #: Request was send back from the mirror
-    response_end = models.DateTimeField()
+    response_end = models.DateTimeField(_('Response end'))
 
     #: Check ends
-    check_end = models.DateTimeField()
+    check_end = models.DateTimeField(_('Check end'))
 
-    raw_response = models.TextField(null=True, blank=True)
+    raw_response = models.TextField(_('Raw response'), null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(ProxyCheckResult, self).__init__(*args, **kwargs)
         if self.real_ip_address is None:
             self.real_ip_address = self._get_real_ip()
 
+    class Meta:
+        verbose_name = _('Proxy check results')
+        verbose_name_plural = _('Proxy check results')
+
     def __unicode__(self):
         return str(self.check_start)
 
-    def _get_real_ip(self):
+    @staticmethod
+    def _get_real_ip():
         ip_key = '%s.%s.ip' % (socket.gethostname(), os.getpid())
         ip = cache.get(ip_key)
         if ip:
@@ -110,16 +115,22 @@ class ProxyCheckResult(models.Model):
 
 
 class Mirror(models.Model):
-    """A proxy checker site like.
+    """
+    A proxy checker site like.
     Ex: http://ifconfig.me/all.json
     """
-    url = models.URLField(help_text='For example: http://local.com/mirror')
+    url = models.URLField(
+        _('URL'), help_text=_('For example: http://local.com/mirror'))
 
     output_type = models.CharField(
-        max_length=10, default='plm_v1', choices=(
-            ('plm_v1', 'ProxyList Mirror v1.0'),
+        _('Output type'), max_length=10, default='plm_v1', choices=(
+            ('plm_v1', _('ProxyList Mirror v1.0')),
         )
     )
+
+    class Meta:
+        verbose_name = _('Mirror')
+        verbose_name_plural = _('Mirrors')
 
     def __unicode__(self):
         return self.url
@@ -145,11 +156,14 @@ class Mirror(models.Model):
         g.go(str(self.url))
         return g.response
 
-    def _parse_plm_v1(self, res, raw_data):
-        """ Parse data from a ProxyList Mirror v1.0 output and fill a
-        ProxyCheckResult object """
+    @staticmethod
+    def _parse_plm_v1(res, raw_data):
+        """
+        Parse data from a ProxyList Mirror v1.0 output and fill a
+        ProxyCheckResult object
+        """
 
-        FORWARD_HEADERS = [
+        forward_headers = {
             'FORWARDED',
             'X_FORWARDED_FOR',
             'X_FORWARDED_BY',
@@ -157,8 +171,7 @@ class Mirror(models.Model):
             'X_FORWARDED_PROTO',
             'VIA',
             'CUDA_CLIIP',
-        ]
-        FORWARD_HEADERS = set(FORWARD_HEADERS)
+        }
 
         data = json.loads(raw_data)
 
@@ -169,7 +182,7 @@ class Mirror(models.Model):
 
         # True if we found proxy related http headers
         headers_keys = data['http_headers'].keys()
-        res.forwarded = bool(FORWARD_HEADERS.intersection(headers_keys))
+        res.forwarded = bool(forward_headers.intersection(headers_keys))
 
         headers_values = data['http_headers'].values()
 
@@ -177,17 +190,18 @@ class Mirror(models.Model):
         res.ip_reveal = any(
             [x.find(res.real_ip_address) != -1 for x in headers_values])
 
-    def is_checking(self, proxy):
+    @staticmethod
+    def is_checking(proxy):
         return bool(cache.get("proxy.%s.check" % proxy.pk))
 
     def _get_elapsed_time(self, proxy):
         time = []
-        req_range = CALCULATE_ELAPSED_TIME_REQUESTS_RANGE
+        req_range = defaults.CALCULATE_ELAPSED_TIME_REQUESTS_RANGE
         for i in range(random.choice(req_range)):
             try:
                 time.append(self._make_request(proxy).total_time)
-            except:
-                pass
+            except Exception, msg:
+                print msg.__str__()
         return sum(time) / float(len(time))
 
     def _check_proxy(self, proxy):
@@ -249,49 +263,57 @@ class Proxy(models.Model):
 
     anonymity_level_choices = (
         # Anonymity can't be determined
-        (None, 'Unknown'),
+        (None, _('Unknown')),
 
         # No anonymity; remote host knows your IP and knows you are using
         # proxy.
-        (ANONYMITY_NONE, 'None'),
+        (ANONYMITY_NONE, _('None')),
 
         # Low anonymity; proxy sent our IP to remote host, but it was sent in
         # non standard way (unknown header).
-        (ANONYMITY_LOW, 'Low'),
+        (ANONYMITY_LOW, _('Low')),
 
         # Medium anonymity; remote host knows you are using proxy, but it does
         # not know your IP
-        (ANONYMITY_MEDIUM, 'Medium'),
+        (ANONYMITY_MEDIUM, _('Medium')),
 
         # High anonymity; remote host does not know your IP and has no direct
         # proof of proxy usage (proxy-connection family header strings).
-        (ANONYMITY_HIGH, 'High'),
+        (ANONYMITY_HIGH, _('High')),
     )
 
-    hostname = models.CharField(max_length=75)
-    port = models.PositiveIntegerField()
-    user = models.CharField(blank=True, null=True, max_length=50)
-    password = models.CharField(blank=True, null=True, max_length=50)
+    hostname = models.CharField(_('Hostname'), max_length=75)
+    port = models.PositiveIntegerField(_('Port'))
+    user = models.CharField(_('User'), blank=True, null=True, max_length=50)
+    password = models.CharField(
+        _('Password'), blank=True, null=True, max_length=50)
 
-    country = CountryField(null=True, blank=True, editable=False)
+    country = CountryField(
+        _('Country'), null=True, blank=True, editable=False)
 
     proxy_type = models.CharField(
-        default='http', max_length=10, choices=PROXY_TYPE_CHOICES)
+        _('Proxy type'), default='http',
+        max_length=10, choices=PROXY_TYPE_CHOICES)
 
     anonymity_level = models.PositiveIntegerField(
-        null=True, default=ANONYMITY_NONE, choices=anonymity_level_choices,
-        editable=False)
+        _('Anonymity level'), null=True, default=ANONYMITY_NONE,
+        choices=anonymity_level_choices, editable=False)
 
-    last_check = models.DateTimeField(null=True, blank=True, editable=False)
+    last_check = models.DateTimeField(
+        _('Last check'), null=True, blank=True, editable=False)
 
-    next_check = models.DateTimeField(null=True, blank=True)
+    next_check = models.DateTimeField(
+        _('Next check'), null=True, blank=True)
 
     created = models.DateTimeField(
-        auto_now=False, auto_now_add=True, db_index=True, editable=False)
+        _('Created'), auto_now=False, auto_now_add=True,
+        db_index=True, editable=False)
 
-    errors = models.PositiveIntegerField(default=0, editable=False)
+    errors = models.PositiveIntegerField(
+        _('Errors'), default=0, editable=False)
 
-    elapsed_time = models.FloatField(blank=True, null=True, editable=False)
+    elapsed_time = models.FloatField(
+        _('Elapsed time'), blank=True, null=True, editable=False)
 
     def _update_next_check(self):
         """ Calculate and set next check time """
@@ -339,13 +361,14 @@ class Proxy(models.Model):
                 ))
 
         if not self.next_check:
-            self.next_check = (now() - timedelta(seconds=max_check))
+            self.next_check = (now() - timedelta(
+                seconds=defaults.PROXY_LIST_MAX_CHECK_INTERVAL))
 
         super(Proxy, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = 'Proxy'
-        verbose_name_plural = 'Proxies'
+        verbose_name = _('Proxy')
+        verbose_name_plural = _('Proxies')
         ordering = ('-last_check',)
         unique_together = (('hostname', 'port'),)
         if VERSION >= (1, 5):
@@ -360,24 +383,33 @@ class Proxy(models.Model):
 
 class Upload(models.Model):
     file_name = models.FileField(
-        upload_to='proxies',
-        help_text='File format: proxy:port@user:password')
+        _('File'), upload_to='proxies',
+        help_text=_('File format: proxy:port@user:password'))
     created = models.DateTimeField(
-        auto_now=False, auto_now_add=True, editable=False)
+        _('Created'), auto_now=False, auto_now_add=True, editable=False)
     proxy_type = models.CharField(
-        default='http', max_length=10, choices=PROXY_TYPE_CHOICES)
+        _('Proxy type'), default='http',
+        max_length=10, choices=PROXY_TYPE_CHOICES)
+
+    def __unicode__(self):
+        return unicode(self.file_name)
+
+    class Meta:
+        verbose_name = _('Upload')
+        verbose_name_plural = _('Uploads')
 
 
 class ProxyList(models.Model):
-    url = models.URLField(unique=True)
-    update_period = models.IntegerField(default=300)
+    url = models.URLField(_('URL'), unique=True)
+    update_period = models.IntegerField(_('Update period'), default=300)
     next_check = models.DateTimeField(
-        null=True, blank=True, editable=False, auto_now_add=True)
-    created = models.DateTimeField(auto_now_add=True)
+        _('Next check'), null=True, blank=True,
+        editable=False, auto_now_add=True)
+    created = models.DateTimeField(_('Created'), auto_now_add=True)
 
     def __unicode__(self):
         return unicode(self.url)
 
     class Meta:
-        verbose_name = 'Proxylist urls'
-        verbose_name_plural = 'Proxylist urls'
+        verbose_name = _('Proxylist urls')
+        verbose_name_plural = _('Proxylist urls')

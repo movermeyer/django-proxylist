@@ -12,7 +12,7 @@ from proxylist import now
 def mirror(request):
     start = now()
 
-    SERIALIZABLE = (str, unicode, bool, int, float)
+    serializable = (str, unicode, bool, int, float)
 
     output = dict()
 
@@ -22,7 +22,7 @@ def mirror(request):
     # HTTP Headers
     output['http_headers'] = dict()
     for k, v in request.META.items():
-        if k.startswith('HTTP_') and type(v) in SERIALIZABLE:
+        if k.startswith('HTTP_') and type(v) in serializable:
             output['http_headers'][k[5:]] = v
 
     # Timing

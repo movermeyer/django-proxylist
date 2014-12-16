@@ -2,22 +2,20 @@
 
 from django.shortcuts import render
 from django.contrib import admin
-from django.conf import settings
 from django.http import Http404
 from django import VERSION
 
-if VERSION[1] < 5:
+if VERSION < (1, 5):
     from django.conf.urls.defaults import patterns, url
 else:
     from django.conf.urls import patterns, url
 
 from proxylist.models import Proxy, Mirror, ProxyCheckResult, Upload, ProxyList
+from proxylist import defaults
 try:
     from proxylist import tasks
 except ImportError:
     pass
-
-import defaults
 
 
 class ProxyAdmin(admin.ModelAdmin):
@@ -138,5 +136,5 @@ admin.site.register(Upload, UploadAdmin)
 admin.site.register(Mirror, MirrorAdmin)
 admin.site.register(Proxy, ProxyAdmin)
 
-if settings.DEBUG:
+if defaults.PROXY_CHECK_RESULTS:
     admin.site.register(ProxyCheckResult, ProxyCheckResultAdmin)

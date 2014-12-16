@@ -21,8 +21,9 @@ DATABASES = {
 }
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    "default": {
+        "BACKEND": "redis_cache.cache.RedisCache",
+        "LOCATION": "127.0.0.1:6379:1",
     }
 }
 
@@ -34,11 +35,16 @@ ALLOWED_HOSTS = []
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Moscow'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
+LANGUAGES = (
+    ('ru', 'Russian'),
+    ('en', 'English'),
+)
+
 
 SITE_ID = 1
 
@@ -129,12 +135,17 @@ INSTALLED_APPS = (
     'grappelli',
     'django.contrib.admin',
 
+    'rosetta',
     'django_extensions',
     'proxylist',
     # 'djcelery',
     'south',
     'test',
 )
+
+ROSETTA_STORAGE_CLASS = 'rosetta.storage.CacheRosettaStorage'
+ROSETTA_ENABLE_TRANSLATION_SUGGESTIONS = True
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

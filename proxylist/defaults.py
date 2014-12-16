@@ -24,7 +24,7 @@ PROXY_LIST_OUTIP_INTERVAL = get_settings(
 PROXY_LIST_USER_AGENT = get_settings(
     "PROXY_LIST_USER_AGENT", "Django-Proxy 1.0.0")
 PROXY_LIST_ELAPSED_TIME = get_settings('PROXY_LIST_ELAPSED_TIME', None)
-
+PROXY_CHECK_RESULTS = get_settings('PROXY_CHECK_RESULTS', False)
 
 if 'djcelery' not in settings.INSTALLED_APPS:
     PROXY_LIST_USE_CELERY = False
