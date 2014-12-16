@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.core.cache import cache
 from django.shortcuts import render
 from django.contrib import admin
 from django.conf import settings
