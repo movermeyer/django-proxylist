@@ -6,10 +6,10 @@ Django-ProxyList-For-Grab
     :target: https://travis-ci.org/gotlium/django-proxylist
 .. image:: https://coveralls.io/repos/gotlium/django-proxylist/badge.png?branch=master
     :target: https://coveralls.io/r/gotlium/django-proxylist?branch=master
-.. image:: https://pypip.in/v/django-proxylist-for-grab/badge.png
+.. image:: https://img.shields.io/pypi/v/django-proxylist-for-grab.svg
     :alt: Current version on PyPi
     :target: https://crate.io/packages/django-proxylist-for-grab/
-.. image:: https://pypip.in/d/django-proxylist-for-grab/badge.png
+.. image:: https://img.shields.io/pypi/dm/django-proxylist-for-grab.svg
     :alt: Downloads from PyPi
     :target: https://crate.io/packages/django-proxylist-for-grab/
 
